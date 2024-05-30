@@ -1,9 +1,0 @@
-mkdir TicTacToeGame
-cd TicTacToeGame
-
-mkdir -p src
-cd src
-mkdir com
-cd com
-mkdir tictactoe
-cd tictactoe
