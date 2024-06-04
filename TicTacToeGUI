@@ -1,31 +1,20 @@
-// src/TicTacToeGUI.java
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class TicTacToeGUI extends JFrame implements ActionListener {
-    private Board board;
+    private Game game;
     private JButton[][] buttons;
-    private Player player1;
-    private Player player2;
-    private Player currentPlayer;
 
-    public TicTacToeGUI() {
-        board = new Board();
+    public TicTacToeGUI(Player player1, Player player2) {
+        game = new Game(player1, player2);
         buttons = new JButton[3][3];
-        initializePlayers();
         initializeUI();
     }
 
-    private void initializePlayers() {
-        player1 = new HumanPlayer("Player 1", 'X');
-        player2 = new AIPlayer("AI", 'O');
-        currentPlayer = player1;
-    }
-
     private void initializeUI() {
-        setTitle("Tic Tac Toe");
+        setTitle("Jogo Da Velha");
         setSize(300, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(3, 3));
@@ -43,37 +32,32 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    private void switchPlayer() {
-        currentPlayer = (currentPlayer == player1) ? player2 : player1;
-    }
-
-    @Override
     public void actionPerformed(ActionEvent e) {
         JButton buttonClicked = (JButton) e.getSource();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (buttons[i][j] == buttonClicked) {
-                    if (board.makeMove(i, j, currentPlayer.getSymbol())) {
-                        buttonClicked.setText(String.valueOf(currentPlayer.getSymbol()));
-                        if (board.checkWin(currentPlayer.getSymbol())) {
-                            JOptionPane.showMessageDialog(this, currentPlayer.getName() + " wins!");
+                    if (game.makeMove(i, j)) {
+                        buttonClicked.setText(String.valueOf(game.getCurrentPlayer().getSymbol()));
+                        if (game.checkWin()) {
+                            JOptionPane.showMessageDialog(this, game.getCurrentPlayer().getName() + " Ganhou!");
                             resetBoard();
-                        } else if (board.isBoardFull()) {
-                            JOptionPane.showMessageDialog(this, "The game is a tie!");
+                        } else if (game.isBoardFull()) {
+                            JOptionPane.showMessageDialog(this, ""O Jogo Empatou!");
                             resetBoard();
                         } else {
-                            switchPlayer();
-                            if (currentPlayer instanceof AIPlayer) {
-                                currentPlayer.makeMove(board);
+                            game.switchPlayer();
+                            if (game.getCurrentPlayer() instanceof AIPlayer) {
+                                game.getCurrentPlayer().makeMove(game.getBoard());
                                 updateBoard();
-                                if (board.checkWin(currentPlayer.getSymbol())) {
-                                    JOptionPane.showMessageDialog(this, currentPlayer.getName() + " wins!");
+                                if (game.checkWin()) {
+                                    JOptionPane.showMessageDialog(this, game.getCurrentPlayer().getName() + " Ganhou!");
                                     resetBoard();
-                                } else if (board.isBoardFull()) {
-                                    JOptionPane.showMessageDialog(this, "The game is a tie!");
+                                } else if (game.isBoardFull()) {
+                                    JOptionPane.showMessageDialog(this, "O Jogo Empatou!");
                                     resetBoard();
                                 } else {
-                                    switchPlayer();
+                                    game.switchPlayer();
                                 }
                             }
                         }
@@ -84,7 +68,7 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
     }
 
     private void updateBoard() {
-        char[][] boardArray = board.getBoard();
+        char[][] boardArray = game.getBoard().getBoard();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 buttons[i][j].setText(String.valueOf(boardArray[i][j]));
@@ -93,16 +77,12 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
     }
 
     private void resetBoard() {
-        board.initializeBoard();
+        game.resetGame();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 buttons[i][j].setText("");
             }
         }
-        currentPlayer = player1;
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new TicTacToeGUI());
     }
 }
+
